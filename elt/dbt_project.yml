@@ -9,9 +9,6 @@ macro-paths: ["macros"]
 
 models:
   elt:
-    raw:
-      +schema: raw
-      materialized: table
     staging:
       +schema: staging
       materialized: table
