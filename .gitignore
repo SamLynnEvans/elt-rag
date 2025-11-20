@@ -1,5 +1,7 @@
 .idea/
 
+chroma_store/
+
 elt/logs/
 elt/target/
 

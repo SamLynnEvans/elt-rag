@@ -1,16 +1,15 @@
-version: "3.9"
-
 services:
-  dbt:
+  elt:
     build:
       context: .
       dockerfile: Dockerfile.dbt
-    container_name: dbt_dev
+    container_name: elt_dev
     working_dir: /app
     volumes:
-      - .:/app
+      - ./elt:/app/elt
       - duckdb_data:/app/database
-    command: sleep infinity
+      - ./raw_data:/app/raw_data
+    command: ["dbt", "build", "--project-dir", "/app/elt", "--profiles-dir", "/app/elt/.dbt", "--target", "dev"]
 
   jupyter:
     build:
@@ -19,13 +18,17 @@ services:
     container_name: jupyter_dev
     working_dir: /app
     volumes:
-      - .:/app
+      - ./notebooks:/app/notebooks
       - duckdb_data:/app/database
+      - chroma_data:/app/chroma_store
     ports:
       - "8888:8888"
     environment:
       - PYTHONUNBUFFERED=1
       - ENV=dev
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - CHROMA_DB_DIR=/app/chroma_store
+      - DUCKDB_PATH=/app/database/mydb.duckdb
     command: >
       jupyter lab
       --ip=0.0.0.0
@@ -37,3 +40,4 @@ services:
 
 volumes:
   duckdb_data:
+  chroma_data:
